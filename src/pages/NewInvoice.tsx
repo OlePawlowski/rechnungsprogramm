@@ -3,18 +3,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { createPortal } from 'react-dom';
 import {
-  Eye,
   Save,
   Send,
   Download,
   ChevronDown,
   Plus,
-  Search,
   Settings,
 } from 'lucide-react';
 import { useInvoiceStore } from '../store/invoiceStore';
 import { formatCurrency } from '../utils/invoiceCalculations';
-import { generateInvoicePDF, previewInvoicePDF } from '../utils/pdfExport';
+import { generateInvoicePDF } from '../utils/pdfExport';
 
 const defaultHeaderText = `Sehr geehrte Damen und Herren,
 
@@ -150,33 +148,6 @@ export function NewInvoice() {
     }
   };
 
-  const handlePreview = async () => {
-    const invoiceForPreview = {
-      id: 'preview',
-      invoiceNumber,
-      status: 'entwurf' as const,
-      partnerId,
-      customerId,
-      agreedTotalAmount,
-      commissionRate,
-      commissionAmount,
-      invoiceDate,
-      performancePeriodFrom,
-      performancePeriodTo,
-      dueDate: format(dueDate, 'yyyy-MM-dd'),
-      referenceNumber: referenceNumber || undefined,
-      subject: subject || `Rechnung Nr. ${invoiceNumber} – Vermittlungsprovision`,
-      headerText,
-      positions: [],
-      paymentTermsDays,
-      isLocked: false,
-      paidAmount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    await previewInvoicePDF(invoiceForPreview, partner ?? undefined, customer ?? undefined);
-  };
-
   const handleSendAndDownload = async () => {
     const savedId = handleSave('offen', true);
     setTimeout(async () => {
@@ -211,11 +182,11 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
         </h1>
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={handlePreview}
+            onClick={handleSendAndDownload}
             className="flex items-center gap-2 px-3 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
           >
-            <Eye className="w-4 h-4 shrink-0" />
-            Vorschau
+            <Download className="w-4 h-4 shrink-0" />
+            Herunterladen
           </button>
           <button
             onClick={() => handleSave('entwurf', true)}
@@ -293,13 +264,12 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Kooperationspartner (Rechnungsempfänger) *
               </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <div className="flex gap-2 items-center">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={partnerId}
                     onChange={(e) => setPartnerId(e.target.value)}
-                    className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white"
                   >
                     <option value="">Partner auswählen</option>
                     {partners.map((p) => (
@@ -309,10 +279,10 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
                     ))}
                   </select>
                 </div>
-                <button className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <button type="button" className="shrink-0 p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
                   <Plus className="w-4 h-4" />
                 </button>
-                <button className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <button type="button" className="shrink-0 p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
                   <Settings className="w-4 h-4" />
                 </button>
               </div>
@@ -326,13 +296,12 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Kunde (Pflegebedürftiger) *
               </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <div className="flex gap-2 items-center">
+                <div className="relative flex-1 min-w-0">
                   <select
                     value={customerId}
                     onChange={(e) => setCustomerId(e.target.value)}
-                    className="w-full pl-9 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white"
                   >
                     <option value="">Kunde auswählen</option>
                     {customers.map((c) => (
@@ -342,7 +311,7 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
                     ))}
                   </select>
                 </div>
-                <button className="p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
+                <button type="button" className="shrink-0 p-2.5 border border-gray-300 rounded-lg hover:bg-gray-50">
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
