@@ -4,9 +4,7 @@ import { de } from 'date-fns/locale';
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Filter,
   Download,
-  Eye,
   Lock,
   MoreVertical,
   Plus,
@@ -103,16 +101,6 @@ export function InvoiceList() {
                 {label}
               </button>
             ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
-              <Filter className="w-4 h-4" />
-              Filter
-            </button>
-            <button className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
-              <Download className="w-4 h-4" />
-              Exportieren
-            </button>
           </div>
         </div>
 
@@ -237,13 +225,6 @@ export function InvoiceList() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1">
-                        <Link
-                          to={`/rechnungen/${invoice.id}`}
-                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-                          title="Ansehen"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
                         <button
                           onClick={async () => {
                             const inv = getInvoice(invoice.id);

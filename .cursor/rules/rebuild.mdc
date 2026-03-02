@@ -1,0 +1,12 @@
+---
+description: Nach Code-Änderungen immer neu bauen und Dev-Server neu starten
+globs: 
+---
+
+# Rebuild nach Änderungen
+
+Nach jeder Code-Änderung am Sevdesk-Projekt:
+
+1. **Build ausführen:** `npm run build`
+2. **Dev-Server neu starten:** Alten Prozess auf Port 5173 beenden, dann `npm run dev`
+3. **Localhost:** http://localhost:5173/

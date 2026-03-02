@@ -16,9 +16,7 @@ import { generateInvoicePDF } from '../utils/pdfExport';
 
 const defaultHeaderText = `Sehr geehrte Damen und Herren,
 
-hiermit berechnen wir unsere Vermittlungsprovision für die 24-Stunden-Pflege.
-
-Bitte entnehmen Sie die Details der nachfolgenden Aufstellung.`;
+hiermit stellen wir Ihnen folgende Leistungen in Rechnung.`;
 
 export function NewInvoice() {
   const navigate = useNavigate();
@@ -68,6 +66,9 @@ export function NewInvoice() {
   );
   const [paymentTermsDays, setPaymentTermsDays] = useState(
     existingInvoice?.paymentTermsDays ?? 14
+  );
+  const [reverseCharge, setReverseCharge] = useState(
+    existingInvoice?.reverseCharge ?? false
   );
   const [subject, setSubject] = useState(existingInvoice?.subject || '');
   const [headerText, setHeaderText] = useState(
@@ -133,6 +134,7 @@ export function NewInvoice() {
       headerText,
       positions: [],
       paymentTermsDays,
+      reverseCharge,
       isLocked: status !== 'entwurf',
       paidAmount: 0,
     };
@@ -166,11 +168,9 @@ export function NewInvoice() {
     if (customer && agreedTotalAmount > 0) {
       setHeaderText(`Sehr geehrte Damen und Herren,
 
-hiermit berechnen wir unsere Vermittlungsprovision für die 24-Stunden-Pflege von ${customer.name}.
+hiermit stellen wir Ihnen folgende Leistungen in Rechnung.
 
-Vereinbarter Gesamtbetrag (Partner – Kunde): ${formatCurrency(agreedTotalAmount)}
-Provisionssatz: ${commissionRate} %
-Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
+Vermittlungsprovision für 24-Stunden-Pflege von ${customer.name}: ${formatCurrency(agreedTotalAmount)} × ${commissionRate} % = ${formatCurrency(commissionAmount)}.`);
     }
   };
 
@@ -561,6 +561,19 @@ Rechnungsbetrag: ${formatCurrency(commissionAmount)}`);
                 />
                 <span className="text-sm text-gray-500 shrink-0">Tagen</span>
               </div>
+            </div>
+            <div className="flex items-center">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reverseCharge}
+                  onChange={(e) => setReverseCharge(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Reverse Charge (Steuerumkehr §13b UStG)
+                </span>
+              </label>
             </div>
           </div>
         </section>

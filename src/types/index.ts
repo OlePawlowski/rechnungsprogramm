@@ -63,6 +63,8 @@ export interface Invoice {
   headerText: string;
   positions: InvoicePosition[];
   paymentTermsDays: number;
+  /** Steuerumkehr gemäß §13b UStG – Steuer schuldet der Leistungsempfänger */
+  reverseCharge?: boolean;
   isLocked: boolean;
   paidAmount?: number;
   createdAt: string;

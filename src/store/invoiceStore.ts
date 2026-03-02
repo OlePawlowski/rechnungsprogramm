@@ -46,11 +46,7 @@ const createSampleInvoices = (): Invoice[] => {
       subject: 'Rechnung Nr. RE-1341 – Vermittlungsprovision',
       headerText: `Sehr geehrte Damen und Herren,
 
-hiermit berechnen wir unsere Vermittlungsprovision für die 24-Stunden-Pflege von Frau Maria Schmidt.
-
-Vereinbarter Gesamtbetrag (Partner – Kunde): 3.890,00 €
-Provisionssatz: 11 %
-Rechnungsbetrag: 427,90 €`,
+Vermittlungsprovision für 24-Stunden-Pflege von Frau Maria Schmidt: 3.890,00 € × 11 % = 427,90 €.`,
       positions: [],
       paymentTermsDays: 14,
       isLocked: false,
@@ -183,21 +179,36 @@ export const useInvoiceStore = create<InvoiceStore>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 2,
+      version: 3,
       migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as { invoices?: Array<Record<string, unknown>> };
+        if (!state?.invoices) return persistedState as typeof persistedState;
+
         if (version < 2) {
-          const state = persistedState as { invoices?: Array<Record<string, unknown>> };
-          if (state?.invoices) {
-            state.invoices = state.invoices.map((inv) => {
-              const deliveryDate = inv.deliveryDate as string | undefined;
-              if (deliveryDate && !inv.performancePeriodFrom) {
-                const { deliveryDate: _, ...rest } = inv;
-                return { ...rest, performancePeriodFrom: deliveryDate, performancePeriodTo: deliveryDate };
-              }
-              return inv;
-            });
-          }
+          state.invoices = state.invoices.map((inv) => {
+            const deliveryDate = inv.deliveryDate as string | undefined;
+            if (deliveryDate && !inv.performancePeriodFrom) {
+              const { deliveryDate: _, ...rest } = inv;
+              return { ...rest, performancePeriodFrom: deliveryDate, performancePeriodTo: deliveryDate };
+            }
+            return inv;
+          });
         }
+
+        const newHeaderDefault = `Sehr geehrte Damen und Herren,
+
+hiermit stellen wir Ihnen folgende Leistungen in Rechnung.`;
+
+        if (version < 3) {
+          state.invoices = state.invoices.map((inv) => {
+            const header = inv.headerText as string | undefined;
+            if (header && header.includes('Details siehe Aufstellung')) {
+              return { ...inv, headerText: newHeaderDefault };
+            }
+            return inv;
+          });
+        }
+
         return persistedState as typeof persistedState;
       },
     }
